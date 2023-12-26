@@ -1,4 +1,5 @@
 .p816
+.smart
 .include "registers.inc"
 
 .segment "VECCODE"
@@ -66,6 +67,9 @@ RESETE:
 	TCS		; Reset stack pointer register
 
 	; TODO - clear memory and all those other useful things
+TODO:
+	JMP TODO
+
 
 IRQE:
 	; We don't use this vector because we switch to native mode on startup
