@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 # Name of ROM file
-title = ff-snes
+title = bp-ca65-snes
 
 # Location of files
 bindir = bin
@@ -12,7 +12,7 @@ imgdir = chr
 # List of files to build
 objlist = vectors
 
-AS65 = ca65 -g
+AS65 = ca65 -g --cpu 65816 -s
 LD65 = ld65 --dbgfile $(bindir)/$(title).dbg -m $(bindir)/map.txt
 
 .PHONY: clean

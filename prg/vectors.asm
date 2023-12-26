@@ -1,5 +1,3 @@
-.p816
-.smart
 .include "registers.inc"
 
 .segment "VECCODE"
