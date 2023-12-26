@@ -33,5 +33,5 @@ objlisto = $(foreach o,$(objlist),$(objdir)/$(o).o)
 $(bindir)/map.txt $(bindir)/$(title).smc: lorom.cfg $(objlisto)
 	$(LD65) -o $(bindir)/$(title).smc -C $^
 
-$(objdir)/%.o: $(srcdir)/%.s
+$(objdir)/%.o: $(srcdir)/%.asm
 	$(AS65) $< -o $@
