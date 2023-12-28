@@ -44,15 +44,16 @@ NMIE:
 	RTI
 
 RESETE:
-	SEI		; Disable interrupts
+	SEI		; Disable IRQ
+	STZ NMITIMEN	; Disable NMI, timer IRQ, auto joypad read
 	STZ HDMAEN	; Disable horizontal DMA
 	STZ MDMAEN	; Disable DMA
-	STZ APUIO0	; Disable APU
+	STZ APUIO0	; Clear APU IO ports
 	STZ APUIO1
 	STZ APUIO2
 	STZ APUIO3
 	LDA #$80
-	STA INIDISP	; Disable display
+	STA INIDISP	; Disable rendering (enable F-blank)
 
 	CLC		; Clear carry bit
 	XCE		; Use carry bit to switch from 6502 emulation mode to 65816 native mode
@@ -60,7 +61,6 @@ RESETE:
 
 	LDA #$0000
 	TCD		; Reset direct-page register
-
 	LDA #$01ff
 	TCS		; Reset stack pointer register
 
