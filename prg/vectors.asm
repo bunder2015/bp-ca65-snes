@@ -15,16 +15,58 @@ ABORTN:
 	JMP RESETE
 
 NMIN:
+	SEI		; Disable interrupts
+	PHP		; Push processor flags to stack
+	REP #$30	; Set accumulator and index registers to 16-bit
+	PHA
+	PHX
+	PHY		; Push AXY to stack
+
+	PHB		; Push data bank to stack
+	PHK		; Push program bank to stack
+	PLB		; Pull new data bank from stack
+
+	LDA RDNMI	; Acknowledge NMI
+
 	; TODO
-	RTI
+
+	REP #$30	; Set accumulator and index registers to 16-bit
+	PLB		; Pull data bank from stack
+	PLY
+	PLX
+	PLA		; Pull AXY from stack
+	PLP		; Pull processor flags from stack
+
+	RTI		; Return to code
 
 RESETN:
 	; This shouldn't happen in 16-bit native mode, but we can jump to the 8-bit reset vector
 	JMP RESETE
 
 IRQN:
+	SEI		; Disable interrupts
+	PHP		; Push processor flags to stack
+	REP #$30	; Set accumulator and index registers to 16-bit
+	PHA
+	PHX
+	PHY		; Push AXY to stack
+
+	PHB		; Push data bank to stack
+	PHK		; Push program bank to stack
+	PLB		; Pull new data bank from stack
+
+	LDA TIMEUP	; Acknowledge IRQ
+
 	; TODO
-	RTI
+
+	REP #$30	; Set accumulator and index registers to 16-bit
+	PLB		; Pull data bank from stack
+	PLY
+	PLX
+	PLA		; Pull AXY from stack
+	PLP		; Pull processor flags from stack
+
+	RTI		; Return to code
 
 ; 6502 emulation vector code
 COPE:
@@ -58,9 +100,10 @@ RESETE:
 	CLC		; Clear carry bit
 	XCE		; Use carry bit to switch from 6502 emulation mode to 65816 native mode
 	REP #$38	; Disable decimal mode, set accumulator to 16-bit, set index registers to 16-bit
-
+	JML @L_RESETE	; Perform a long-jump to use FastROM bank
+@L_RESETE:
 	LDA #$0000
-	TCD		; Reset direct-page register
+	TCD		; Reset direct-page (aka zero-page) register
 	LDA #$01ff
 	TCS		; Reset stack pointer register
 
