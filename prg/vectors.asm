@@ -100,6 +100,8 @@ RESETE:
 	CLC		; Clear carry bit
 	XCE		; Use carry bit to switch from 6502 emulation mode to 65816 native mode
 	REP #$38	; Disable decimal mode, set accumulator to 16-bit, set index registers to 16-bit
+	LDA #$0001
+	STA MEMSEL	; Enable FastROM speed
 	JML @L_RESETE	; Perform a long-jump to use FastROM bank
 @L_RESETE:
 	LDA #$0000
