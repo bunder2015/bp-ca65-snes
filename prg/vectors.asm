@@ -120,7 +120,7 @@ RESETE:
 	STA DMAP0	; Fixed address source
 
 	LDA #WMDATA & $FF
-	STA BBAD0	; B-bus address
+	STA BBAD0	; B-bus address $2180
 
 	LDA #.BANKBYTE(@RESET_BYTE)
 	STA A1B0
@@ -138,6 +138,27 @@ RESETE:
 
 	LDA #$01
 	STA MDMAEN	; Copy 64k to $7F0000-$7FFFFF
+
+	STZ CGADD	; Set CGRAM destination address for DMA transfer
+
+	LDA #$10
+	STA DMAP0	; Fixed address souce, write destination address twice before incrementing
+
+	LDA #.BANKBYTE(@RESET_BYTE)
+	STA A1B0
+	LDX #.LOWORD(@RESET_BYTE)
+	STX A1T0L
+
+	LDA #CGDATA & $FF
+	STA BBAD0	; B-bus address $2122
+
+	LDA #$FF
+	STA DAS0L
+	LDA #$01
+	STA DAS0H	; Transfer size = 512b
+
+	LDA #$01
+	STA MDMAEN	; Copy 512b to CGRAM
 
 @TODO:
 	; TODO - clear PPU memory and all those other useful things
