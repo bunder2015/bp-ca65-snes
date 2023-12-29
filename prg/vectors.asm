@@ -87,32 +87,64 @@ NMIE:
 
 RESETE:
 	SEI		; Disable IRQ
+	CLC		; Clear carry bit
+	XCE		; Use carry bit to switch from 6502 emulation mode to 65816 native mode
+	REP #$FF
+	SEP #$24	; Disable decimal mode, set accumulator to 8-bit, set index registers to 16-bit
 	STZ NMITIMEN	; Disable NMI, timer IRQ, auto joypad read
 	STZ HDMAEN	; Disable horizontal DMA
 	STZ MDMAEN	; Disable DMA
-	STZ APUIO0	; Clear APU IO ports
+	STZ APUIO0
 	STZ APUIO1
 	STZ APUIO2
-	STZ APUIO3
+	STZ APUIO3	; Clear APU IO ports
 	LDA #$80
 	STA INIDISP	; Disable rendering (enable F-blank)
 
-	CLC		; Clear carry bit
-	XCE		; Use carry bit to switch from 6502 emulation mode to 65816 native mode
-	REP #$38	; Disable decimal mode, set accumulator to 16-bit, set index registers to 16-bit
-	LDA #$0001
+	LDA #$01
 	STA MEMSEL	; Enable FastROM speed
 	JML @L_RESETE	; Perform a long-jump to use FastROM bank
 @L_RESETE:
+	REP #$20	; Set accumulator to 16-bit
 	LDA #$0000
-	TCD		; Reset direct-page (aka zero-page) register
-	LDA #$01ff
-	TCS		; Reset stack pointer register
+	TCD		; Set direct-page (aka zero-page) register
+	LDA #$01FF
+	TCS		; Set stack pointer register
+	SEP #$20	; Set accumulator back to 8-bit
 
-	; TODO - clear memory and all those other useful things
-TODO:
-	JMP TODO
+	STZ WMADDL
+	STZ WMADDM
+	STZ WMADDH	; Set WRAM destination address for DMA transfer ($000000 means 7E0000)
 
+	LDA #$08
+	STA DMAP0	; Fixed address source
+
+	LDA #WMDATA & $FF
+	STA BBAD0	; B-bus address
+
+	LDA #.BANKBYTE(@RESET_BYTE)
+	STA A1B0
+	LDX #.LOWORD(@RESET_BYTE)
+	STX A1T0L	; Set source address to the 24-bit address of RESET_BYTE
+
+	STZ DAS0L
+	STZ DAS0H	; Transfer size = 64k
+
+	LDA #$01
+	STA MDMAEN	; Copy 64k to $7E0000-$7EFFFF
+
+	LDA #$01
+	STA WMADDH	; Change WMADDH for the next 64k ($010000 means $7F0000)
+
+	LDA #$01
+	STA MDMAEN	; Copy 64k to $7F0000-$7FFFFF
+
+@TODO:
+	; TODO - clear PPU memory and all those other useful things
+	JMP @TODO
+
+@RESET_BYTE:
+	.BYTE $00
 
 IRQE:
 	; We don't use this vector because we switch to native mode on startup
