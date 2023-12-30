@@ -15,22 +15,21 @@ ABORTN:
 	JMP RESETE
 
 NMIN:
-	SEI		; Disable interrupts
 	PHP		; Push processor flags to stack
-	REP #$30	; Set accumulator and index registers to 16-bit
 	PHA
 	PHX
 	PHY		; Push AXY to stack
-
 	PHB		; Push data bank to stack
 	PHK		; Push program bank to stack
 	PLB		; Pull new data bank from stack
+	REP #$FF
+	SEP #$24	; Disable decimal mode, set accumulator to 8-bit, set index registers to 16-bit
+
 
 	LDA RDNMI	; Acknowledge NMI
 
 	; TODO
 
-	REP #$30	; Set accumulator and index registers to 16-bit
 	PLB		; Pull data bank from stack
 	PLY
 	PLX
@@ -44,22 +43,20 @@ RESETN:
 	JMP RESETE
 
 IRQN:
-	SEI		; Disable interrupts
 	PHP		; Push processor flags to stack
-	REP #$30	; Set accumulator and index registers to 16-bit
 	PHA
 	PHX
 	PHY		; Push AXY to stack
-
 	PHB		; Push data bank to stack
 	PHK		; Push program bank to stack
 	PLB		; Pull new data bank from stack
+	REP #$FF
+	SEP #$24	; Disable decimal mode, set accumulator to 8-bit, set index registers to 16-bit
 
 	LDA TIMEUP	; Acknowledge IRQ
 
 	; TODO
 
-	REP #$30	; Set accumulator and index registers to 16-bit
 	PLB		; Pull data bank from stack
 	PLY
 	PLX
