@@ -193,8 +193,31 @@ RESETE:
 	LDA #$01
 	STA MDMAEN	; Copy 32b to OAM
 
+	STZ VMADDL
+	STZ VMADDH	; Set VRAM destination address for DMA transfer
+
+	LDA #$80
+	STA VMAIN	; Set VRAM to increment after every word written
+
+	LDA #$09
+	STA DMAP0	; Fixed address source, write whole word before incrementing
+
+	LDA #VMDATAL & $FF
+	STA BBAD0	; B-bus address $2119
+
+	LDA #.BANKBYTE(@RESET_BYTE)
+	STA A1B0
+	LDX #.LOWORD(@RESET_BYTE)
+	STX A1T0L	; Set source address to the 24-bit address of RESET_BYTE
+
+	STZ DAS0L
+	STZ DAS0H	; Transfer size = 64k
+
+	LDA #$01
+	STA MDMAEN	; Copy 64k to VRAM
+
 @TODO:
-	; TODO - clear PPU memory and all those other useful things
+	; TODO - more fun stuff
 	JMP @TODO
 
 @RESET_BYTE:
