@@ -141,24 +141,57 @@ RESETE:
 
 	STZ CGADD	; Set CGRAM destination address for DMA transfer
 
-	LDA #$10
-	STA DMAP0	; Fixed address souce, write destination address twice before incrementing
-
-	LDA #.BANKBYTE(@RESET_BYTE)
-	STA A1B0
-	LDX #.LOWORD(@RESET_BYTE)
-	STX A1T0L
+	LDA #$0A
+	STA DMAP0	; Fixed address source, write destination address twice before incrementing
 
 	LDA #CGDATA & $FF
 	STA BBAD0	; B-bus address $2122
 
-	LDA #$FF
-	STA DAS0L
-	LDA #$01
+	LDA #.BANKBYTE(@RESET_BYTE)
+	STA A1B0
+	LDX #.LOWORD(@RESET_BYTE)
+	STX A1T0L	; Set source address to the 24-bit address of RESET_BYTE
+
+	STZ DAS0L
+	LDA #$02
 	STA DAS0H	; Transfer size = 512b
 
 	LDA #$01
 	STA MDMAEN	; Copy 512b to CGRAM
+
+	STZ OAMADDL
+	STZ OAMADDH	; Set OAM destination address for DMA transfer
+
+	LDA #$0A
+	STA DMAP0	; Fixed address source, write destination address twice before incrementing
+
+	LDA #OAMDATA & $FF
+	STA BBAD0	; B-bus address $2104
+
+	LDA #.BANKBYTE(@RESET_BYTE)
+	STA A1B0
+	LDX #.LOWORD(@RESET_BYTE)
+	STX A1T0L	; Set source address to the 24-bit address of RESET_BYTE
+
+	STZ DAS0L
+	LDA #$02
+	STA DAS0H	; Transfer size = 512b
+
+	LDA #$01
+	STA MDMAEN	; Copy 512b to OAM
+
+	LDA #$01
+	STA OAMADDH	; Switch to last 32 bytes of OAM
+
+	LDA #$08
+	STA DMAP0	; Fixed address, write once
+
+	LDA #$20
+	STA DAS0L
+	STZ DAS0H	; Transfer size = 32b
+
+	LDA #$01
+	STA MDMAEN	; Copy 32b to OAM
 
 @TODO:
 	; TODO - clear PPU memory and all those other useful things
