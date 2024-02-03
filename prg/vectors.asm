@@ -1,4 +1,5 @@
 .include "registers.inc"
+.include "intro.inc"
 
 .segment "VECCODE"
 ; 65816 native vector code
@@ -213,9 +214,7 @@ RESETE:
 	LDA #$01
 	STA MDMAEN	; Copy 64k to VRAM
 
-@TODO:
-	; TODO - more fun stuff
-	JMP @TODO
+	JML INTRO	; Jump to intro code
 
 @RESET_BYTE:
 	.BYTE $00

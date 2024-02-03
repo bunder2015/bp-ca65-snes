@@ -10,7 +10,7 @@ srcdir = prg
 imgdir = chr
 
 # List of files to build
-objlist = header wram vectors
+objlist = header wram vectors intro
 
 AS65 = ca65 -g --cpu 65816 -s
 LD65 = ld65 --dbgfile $(bindir)/$(title).dbg -m $(bindir)/map.txt
